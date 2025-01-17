@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gliderecord-query - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+        }
+        nav {
+            width: 250px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-right: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            margin: 8px 0;
+        }
+        nav a {
+            color: #333;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        .current-page {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Documentation</h2>
+        <ul><li><a href="README.html" >README</a></li>
+<li><a href="gliderecord-query.html" class="current-page">gliderecord-query</a></li></ul>
+    </nav>
+    <main>
+        <h1>ServiceNow GlideRecord Methods Guide</h1>
+<p>GlideRecord methods are fundamental to ServiceNow development, enabling you to query, insert, update, and delete records in your system. These methods are essential components of business rules, UI actions, and scheduled job scripts.</p>
+<h2>Important Note</h2>
+<p>These methods are designed for server-side JavaScript (excluding client scripts and UI policies). Some methods can be used in client-side JavaScript and are noted accordingly.</p>
+<h2>Basic Operations</h2>
+<h3>Query Records</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;); // Specify table to query
+gr.addQuery(&#39;active&#39;, true);          // Optional: Add conditions
+gr.query();                           // Execute the query
+while (gr.next()) {                   // Iterate through results
+    if (gr.category == &#39;software&#39;) {
+        gs.log(&#39;Category is &#39; + gr.category);
+    }
+}
+</code></pre>
+<h3>Client-Side Asynchronous Query</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;sys_user&#39;);
+gr.addQuery(&#39;name&#39;, &#39;Joe Employee&#39;);
+gr.query(myCallbackFunction);         // Execute with callback
+
+function myCallbackFunction(gr) {
+    while (gr.next()) {
+        alert(gr.user_name);
+    }
+}
+</code></pre>
+<h3>Get Single Record</h3>
+<pre><code class="language-javascript">// By sys_id (works client-side)
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.get(sys_id_of_record_here);
+
+// By field/value pair
+var gr = new GlideRecord(&#39;incident&#39;);
+if (gr.get(&#39;active&#39;, true)) {
+    gs.log(&#39;Category is &#39; + gr.category);
+}
+</code></pre>
+<h3>Get Referenced Record</h3>
+<pre><code class="language-javascript">var caller = current.caller_id.getRefRecord();
+caller.email = &#39;test@test.com&#39;;
+caller.update();
+</code></pre>
+<h2>Advanced Queries</h2>
+<h3>OR Conditions</h3>
+<pre><code class="language-javascript">// Method 1
+var gr = new GlideRecord(&#39;incident&#39;);
+var grOR = gr.addQuery(&#39;priority&#39;, 1);
+grOR.addOrCondition(&#39;priority&#39;, 2);
+gr.query();
+
+// Method 2 (Chained)
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;priority&#39;, 1).addOrCondition(&#39;priority&#39;, 2);
+gr.query();
+</code></pre>
+<h3>Insert Record</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.initialize();
+gr.short_description = &#39;Network problem&#39;;
+gr.category = &#39;software&#39;;
+gr.caller_id.setDisplayValue(&#39;Joe Employee&#39;);
+gr.insert();
+</code></pre>
+<h3>Update Records</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;active&#39;, true);
+gr.query();
+while (gr.next()) {
+    gr.active = false;
+    gr.update();
+}
+</code></pre>
+<h3>Delete Records</h3>
+<pre><code class="language-javascript">// Delete individual records
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;active&#39;, false);
+gr.query();
+while (gr.next()) {
+    gr.deleteRecord();
+}
+
+// Delete multiple records at once
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;active&#39;, false);
+gr.deleteMultiple();
+</code></pre>
+<h2>Special Query Methods</h2>
+<h3>Encoded Queries</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+var strQuery = &#39;active=true^category=software^ORcategory=hardware&#39;;
+gr.addEncodedQuery(strQuery);
+gr.query();
+</code></pre>
+<h3>GlideAggregate</h3>
+<p>Supports COUNT, SUM, MIN, MAX, and AVG operations:</p>
+<pre><code class="language-javascript">var gr = new GlideAggregate(&#39;incident&#39;);
+gr.addQuery(&#39;active&#39;, true);
+gr.addAggregate(&#39;COUNT&#39;);
+gr.query();
+if (gr.next()) {
+    var incidents = gr.getAggregate(&#39;COUNT&#39;);
+    gs.log(&#39;Active incident count: &#39; + incidents);
+}
+</code></pre>
+<h2>Query Modifiers</h2>
+<h3>Sorting</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;active&#39;, true);
+gr.orderBy(&#39;category&#39;);           // Ascending
+gr.orderByDesc(&#39;sys_created_on&#39;); // Descending
+gr.query();
+</code></pre>
+<h3>Null Queries</h3>
+<pre><code class="language-javascript">// Find empty values
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addNullQuery(&#39;short_description&#39;);
+gr.query();
+
+// Find non-empty values
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addNotNullQuery(&#39;short_description&#39;);
+gr.query();
+</code></pre>
+<h3>Result Management</h3>
+<pre><code class="language-javascript">// Get result count
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;category&#39;, &#39;software&#39;);
+gr.query();
+gs.log(&#39;Incident count: &#39; + gr.getRowCount());
+
+// Limit results
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.orderByDesc(&#39;sys_created_on&#39;);
+gr.setLimit(10);
+gr.query();
+
+// Choose specific window of results
+var gr = new GlideRecord(&#39;incident&#39;);
+gr.orderByDesc(&#39;sys_created_on&#39;);
+gr.chooseWindow(10, 20);  // Rows 10-19
+gr.query();
+</code></pre>
+<h2>Special Update Modifiers</h2>
+<h3>Workflow Control</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;category&#39;, &#39;software&#39;);
+gr.query();
+while (gr.next()) {
+    gr.category = &#39;hardware&#39;;
+    gr.setWorkflow(false);    // Disable business rules
+    gr.update();
+}
+</code></pre>
+<h3>System Fields Control</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.addQuery(&#39;category&#39;, &#39;software&#39;);
+gr.query();
+while (gr.next()) {
+    gr.category = &#39;hardware&#39;;
+    gr.autoSysFields(false);  // Don&#39;t update sys fields
+    gr.update();
+}
+</code></pre>
+<h3>Force Update</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;sys_user&#39;);
+gr.query();
+while (gr.next()) {
+    gr.setWorkflow(false);
+    gr.autoSysFields(false);
+    gr.setForceUpdate(true);
+    gr.update();
+}
+</code></pre>
+<h2>Query Operators</h2>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>=</td>
+<td>Equals</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;=&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>Greater than</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;&gt;&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>Less than</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;&lt;&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>&gt;=</td>
+<td>Greater than or equal</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;&gt;=&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>&lt;=</td>
+<td>Less than or equal</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;&lt;=&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>!=</td>
+<td>Not equal</td>
+<td><code>addQuery(&#39;priority&#39;, &#39;!=&#39;, 3)</code></td>
+</tr>
+<tr>
+<td>STARTSWITH</td>
+<td>Begins with</td>
+<td><code>addQuery(&#39;short_description&#39;, &#39;STARTSWITH&#39;, &#39;Error&#39;)</code></td>
+</tr>
+<tr>
+<td>ENDSWITH</td>
+<td>Ends with</td>
+<td><code>addQuery(&#39;short_description&#39;, &#39;ENDSWITH&#39;, &#39;Error&#39;)</code></td>
+</tr>
+<tr>
+<td>CONTAINS</td>
+<td>Contains</td>
+<td><code>addQuery(&#39;short_description&#39;, &#39;CONTAINS&#39;, &#39;Error&#39;)</code></td>
+</tr>
+<tr>
+<td>DOES NOT CONTAIN</td>
+<td>Doesn&#39;t contain</td>
+<td><code>addQuery(&#39;short_description&#39;, &#39;DOES NOT CONTAIN&#39;, &#39;Error&#39;)</code></td>
+</tr>
+<tr>
+<td>IN</td>
+<td>In list</td>
+<td><code>addQuery(&#39;sys_id&#39;, &#39;IN&#39;, &#39;id1,id2&#39;)</code></td>
+</tr>
+<tr>
+<td>INSTANCEOF</td>
+<td>Class type</td>
+<td><code>addQuery(&#39;sys_class_name&#39;, &#39;INSTANCEOF&#39;, &#39;cmdb_ci_computer&#39;)</code></td>
+</tr>
+</tbody></table>
+
+    </main>
+</body>
+</html>
