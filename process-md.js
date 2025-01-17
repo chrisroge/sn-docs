@@ -9,22 +9,53 @@ const template = fs.readFileSync('template.html', 'utf8');
 const mdFiles = fs.readdirSync('.')
     .filter(file => file.endsWith('.md'));
 
-// Process each MD file and combine content
-const processedContent = mdFiles.map(file => {
+// Create docs directory if it doesn't exist
+if (!fs.existsSync('docs')) {
+    fs.mkdirSync('docs');
+}
+
+// Generate navigation HTML
+function generateNavigation(currentFile = null) {
+    const links = mdFiles.map(file => {
+        const fileName = path.basename(file, '.md');
+        const htmlFile = `${fileName}.html`;
+        const isCurrentPage = currentFile === htmlFile;
+        const className = isCurrentPage ? 'class="current-page"' : '';
+        return `<li><a href="${htmlFile}" ${className}>${fileName}</a></li>`;
+    });
+    return `<ul>${links.join('\n')}</ul>`;
+}
+
+// Process each MD file
+mdFiles.forEach(file => {
     const content = fs.readFileSync(file, 'utf8');
     const htmlContent = marked.parse(content);
     const fileName = path.basename(file, '.md');
+    const htmlFile = `${fileName}.html`;
     
-    return `
-        <div class="document">
-            <h2 class="document-title">${fileName}</h2>
-            ${htmlContent}
-        </div>
-    `;
-}).join('\n');
+    // Replace placeholders in template
+    let pageHtml = template
+        .replace('{{title}}', fileName)
+        .replace('{{navigation}}', generateNavigation(htmlFile))
+        .replace('{{content}}', htmlContent);
+    
+    // Write individual HTML file
+    fs.writeFileSync(path.join('docs', htmlFile), pageHtml);
+});
 
-// Replace placeholder in template with content
-const finalHtml = template.replace('<!-- CONTENT_PLACEHOLDER -->', processedContent);
+// Create index.html that redirects to the first document
+const firstDoc = mdFiles[0] ? path.basename(mdFiles[0], '.md') + '.html' : '';
+const indexHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=docs/${firstDoc}">
+    <title>Documentation</title>
+</head>
+<body>
+    <p>Redirecting to <a href="docs/${firstDoc}">documentation</a>...</p>
+</body>
+</html>`;
 
-// Write the final HTML file
-fs.writeFileSync('index.html', finalHtml);
+fs.writeFileSync('index.html', indexHtml);
