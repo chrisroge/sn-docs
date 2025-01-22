@@ -1,155 +1,119 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
 
 async function processMarkdownFiles() {
-    // Create docs directory if it doesn't exist
-    await fs.mkdir('docs', { recursive: true });
-    
     // Get all markdown files
-    const files = await fs.readdir('.');
-    const mdFiles = files.filter(file => file.endsWith('.md'));
+    const mdFiles = fs.readdirSync('.').filter(file => file.endsWith('.md'));
     
+    // Create docs directory if it doesn't exist
+    if (!fs.existsSync('docs')) {
+        fs.mkdirSync('docs');
+    }
+
     // Process each markdown file
     const pages = [];
-    for (const file of mdFiles) {
-        const content = await fs.readFile(file, 'utf8');
-        const html = marked.parse(content);
+    mdFiles.forEach(file => {
+        const content = fs.readFileSync(file, 'utf8');
+        const htmlContent = marked.parse(content);
+        const fileName = path.basename(file, '.md');
+        const title = fileName.replace(/-/g, ' ');
         
-        // Create HTML file name
-        const htmlFileName = path.basename(file, '.md') + '.html';
-        const title = path.basename(file, '.md')
-            .replace(/-/g, ' ')
-            .replace(/([A-Z])/g, ' $1') // Add spaces before capital letters
-            .trim();
-            
-        // Add to pages array for index
         pages.push({
             title,
-            path: htmlFileName,
-            originalFile: file
+            path: `docs/${fileName}.html`
         });
-        
-        // Generate page HTML with navigation
+
+        // Generate individual doc page with semantic HTML structure
         const pageHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title} - ServiceNow Documentation</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-            line-height: 1.6;
-            color: #24292e;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        nav {
-            background: #f6f8fa;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            border-radius: 6px;
-        }
-        nav a {
-            color: #0366d6;
-            text-decoration: none;
-            margin-right: 1rem;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        h1, h2, h3 { color: #24292e; }
-        pre {
-            background: #f6f8fa;
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-            font-size: 85%;
-        }
-    </style>
+    <title>${title} - Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <nav>
-        <a href="../index.html">← Back to Index</a>
-    </nav>
-    <article>
-        ${html}
-    </article>
+    <div class="documentation-page">
+        <header class="site-header">
+            <nav aria-label="Main navigation">
+                <a href="../index.html">← Back to Documentation Index</a>
+            </nav>
+        </header>
+        <main id="main-content">
+            <article class="documentation-content">
+                <h1>${title}</h1>
+                ${htmlContent}
+            </article>
+            <nav class="page-navigation" aria-label="Documentation navigation">
+                <ul>
+                    ${pages.map(page => 
+                        `<li><a href="${page.path}">${page.title}</a></li>`
+                    ).join('\n                    ')}
+                </ul>
+            </nav>
+        </main>
+    </div>
 </body>
 </html>`;
-        
-        await fs.writeFile(path.join('docs', htmlFileName), pageHtml);
-    }
-    
-    // Sort pages by title
-    pages.sort((a, b) => a.title.localeCompare(b.title));
-    
-    // Generate main index.html
+
+        fs.writeFileSync(path.join('docs', `${fileName}.html`), pageHtml);
+    });
+
+    // Generate index.html with proper semantic structure
     const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceNow Documentation</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-            line-height: 1.6;
-            color: #24292e;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        .toc {
-            background: #fff;
-            border: 1px solid #e1e4e8;
-            border-radius: 6px;
-            padding: 2rem;
-        }
-        .toc h1 {
-            margin-top: 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eaecef;
-        }
-        .toc-list {
-            list-style: none;
-            padding: 0;
-        }
-        .toc-list li {
-            margin: 0.75rem 0;
-        }
-        .toc-list a {
-            color: #0366d6;
-            text-decoration: none;
-            font-size: 1.1rem;
-            display: block;
-            padding: 0.5rem;
-            border-radius: 3px;
-        }
-        .toc-list a:hover {
-            background: #f6f8fa;
-            text-decoration: underline;
-        }
-    </style>
+    <title>Documentation</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="toc">
-        <h1>ServiceNow Documentation</h1>
-        <ul class="toc-list">
-            ${pages.map(page => 
-                `<li><a href="docs/${page.path}">${page.title}</a></li>`
-            ).join('\n            ')}
-        </ul>
+    <div class="documentation-index">
+        <header class="site-header">
+            <h1>Documentation</h1>
+        </header>
+        <main id="main-content">
+            <nav class="documentation-nav" aria-label="Documentation pages">
+                <ul>
+                    ${pages.map(page => 
+                        `<li><a href="${page.path}">${page.title}</a></li>`
+                    ).join('\n                    ')}
+                </ul>
+            </nav>
+        </main>
     </div>
 </body>
 </html>`;
-    
-    await fs.writeFile('index.html', indexHtml);
+
+    fs.writeFileSync('index.html', indexHtml);
+
+    // Generate basic CSS
+    const css = `
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .documentation-nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        .documentation-nav a {
+            display: block;
+            padding: 0.5rem 0;
+            color: #0366d6;
+            text-decoration: none;
+        }
+        .documentation-nav a:hover {
+            text-decoration: underline;
+        }
+    `;
+
+    fs.writeFileSync('styles.css', css);
 }
 
 processMarkdownFiles().catch(console.error);
