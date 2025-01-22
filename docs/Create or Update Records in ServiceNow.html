@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create or Update Records in ServiceNow - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+        }
+        nav {
+            width: 250px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-right: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            margin: 8px 0;
+        }
+        nav a {
+            color: #333;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        .current-page {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Documentation</h2>
+        <ul><li><a href="Create or Update Records in ServiceNow.html" class="current-page">Create or Update Records in ServiceNow</a></li>
+<li><a href="README.html" >README</a></li>
+<li><a href="gliderecord-query.html" >gliderecord-query</a></li>
+<li><a href="shelly.html" >shelly</a></li>
+<li><a href="sn-user-object.html" >sn-user-object</a></li></ul>
+    </nav>
+    <main>
+        <h1>Create or Update Records in ServiceNow</h1>
+<h2>Overview</h2>
+<p>This script provides a template for implementing an &quot;upsert&quot; operation in ServiceNow - either updating an existing record or creating a new one if it doesn&#39;t exist. This pattern is commonly used when you need to ensure a record exists with specific values without creating duplicates.</p>
+<h2>Basic Usage</h2>
+<pre><code class="language-javascript">var grTABLE = new GlideRecord(&#39;TABLENAME&#39;);
+grTABLE.addEncodedQuery(QUERY);
+grTABLE.query();
+
+if (grTABLE.next()) {  // update
+    grTABLE.COL = VAL;
+    grTABLE.update();
+} else {  // insert
+    grTABLE.initialize();
+    grTABLE.COL = VAL;
+    grTABLE.insert();
+}
+</code></pre>
+<h2>Practical Examples</h2>
+<h3>Example 1: Managing Configuration Items</h3>
+<pre><code class="language-javascript">var grCI = new GlideRecord(&#39;cmdb_ci_server&#39;);
+grCI.addEncodedQuery(&#39;serial_number=ABC123&#39;);
+grCI.query();
+
+if (grCI.next()) {
+    // Update existing server record
+    grCI.os_version = &#39;Windows Server 2022&#39;;
+    grCI.ip_address = &#39;192.168.1.100&#39;;
+    grCI.update();
+} else {
+    // Create new server record
+    grCI.initialize();
+    grCI.serial_number = &#39;ABC123&#39;;
+    grCI.name = &#39;PROD-SERVER-01&#39;;
+    grCI.os_version = &#39;Windows Server 2022&#39;;
+    grCI.ip_address = &#39;192.168.1.100&#39;;
+    grCI.insert();
+}
+</code></pre>
+<h3>Example 2: With Business Rule Control</h3>
+<pre><code class="language-javascript">var grIncident = new GlideRecord(&#39;incident&#39;);
+grIncident.addEncodedQuery(&#39;number=INC0010001&#39;);
+grIncident.query();
+
+if (grIncident.next()) {
+    // Disable business rules and workflow
+    grIncident.setWorkflow(false);
+    grIncident.autoSysFields(false);
+    
+    grIncident.state = 2; // In Progress
+    grIncident.assignment_group = &#39;Service Desk&#39;;
+    grIncident.assigned_to = &#39;abel.tuter&#39;;
+    grIncident.update();
+}
+</code></pre>
+<h2>Advanced Features</h2>
+<h3>Workflow Control</h3>
+<ul>
+<li><code>setWorkflow(false)</code>: Prevents business rules and workflows from triggering</li>
+<li><code>autoSysFields(false)</code>: Prevents system fields from being automatically updated</li>
+</ul>
+<h3>Error Handling</h3>
+<pre><code class="language-javascript">var grUser = new GlideRecord(&#39;sys_user&#39;);
+grUser.addEncodedQuery(&#39;email=john.doe@example.com&#39;);
+grUser.query();
+
+if (grUser.next()) {
+    grUser.title = &#39;Senior Developer&#39;;
+    if (!grUser.update()) {
+        gs.error(&#39;Failed to update user record: &#39; + grUser.number);
+        return false;
+    }
+} else {
+    grUser.initialize();
+    grUser.email = &#39;john.doe@example.com&#39;;
+    grUser.title = &#39;Senior Developer&#39;;
+    if (!grUser.insert()) {
+        gs.error(&#39;Failed to create user record&#39;);
+        return false;
+    }
+}
+</code></pre>
+<h2>Best Practices</h2>
+<ol>
+<li><p><strong>Query Validation</strong></p>
+<ul>
+<li>Always verify your query returns the expected records</li>
+<li>Use appropriate encoded queries for complex conditions</li>
+<li>Consider using <code>setLimit(1)</code> if you only need one record</li>
+</ul>
+</li>
+<li><p><strong>Performance Considerations</strong></p>
+<ul>
+<li>Use indexes when querying large tables</li>
+<li>Consider batch processing for multiple records</li>
+<li>Be mindful of business rule impact</li>
+</ul>
+</li>
+<li><p><strong>Security</strong></p>
+<ul>
+<li>Verify user permissions before operations</li>
+<li>Use ACLs appropriately</li>
+<li>Consider data sensitivity</li>
+</ul>
+</li>
+<li><p><strong>Maintenance</strong></p>
+<ul>
+<li>Add appropriate comments and documentation</li>
+<li>Log important operations</li>
+<li>Include error handling</li>
+</ul>
+</li>
+</ol>
+<h2>Common Issues and Solutions</h2>
+<h3>Issue: Duplicate Records</h3>
+<pre><code class="language-javascript">// Check for existing records before insert
+var grCheck = new GlideRecord(&#39;your_table&#39;);
+grCheck.addQuery(&#39;unique_field&#39;, value);
+grCheck.query();
+if (!grCheck.hasNext()) {
+    // Safe to insert
+}
+</code></pre>
+<h3>Issue: Record Locking</h3>
+<pre><code class="language-javascript">// Handle record locks gracefully
+if (!grTABLE.update()) {
+    if (grTABLE.isValidRecord() &amp;&amp; grTABLE.isLocked()) {
+        gs.warn(&#39;Record is locked: &#39; + grTABLE.number);
+        // Implement retry logic or alternative processing
+    }
+}
+</code></pre>
+<h2>Related Resources</h2>
+<ul>
+<li><a href="https://developer.servicenow.com/dev.do#!/reference/api/tokyo/server/no-namespace/c_GlideRecordAPI">ServiceNow GlideRecord API Documentation</a></li>
+<li><a href="https://developer.servicenow.com/dev.do#!/guides/tokyo/now-platform/tpb-guide/scripting_best_practices">ServiceNow Best Practices Guide</a></li>
+</ul>
+
+    </main>
+</body>
+</html>
