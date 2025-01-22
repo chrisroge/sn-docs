@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sn-mid-params - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+        }
+        nav {
+            width: 250px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-right: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            margin: 8px 0;
+        }
+        nav a {
+            color: #333;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        .current-page {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Documentation</h2>
+        <ul><li><a href="README.html" >README</a></li>
+<li><a href="gliderecord-query.html" >gliderecord-query</a></li>
+<li><a href="sn-mid-params.html" class="current-page">sn-mid-params</a></li>
+<li><a href="sn-user-object.html" >sn-user-object</a></li></ul>
+    </nav>
+    <main>
+        <p>Here&#39;s the cleaned-up version in proper Markdown format:</p>
+<h1>MID Server Parameters for PowerShell</h1>
+<h2>Release version: Xanadu, Washington DC, Vancouver, Utah</h2>
+<p><em>Updated: Jul 31, 2024</em></p>
+<p><em>3 minutes to read</em></p>
+<p>Parameters control the behavior of a particular MID Server and have lower precedence than MID Server properties. The following parameters are optional.</p>
+<p><strong>Note:</strong> After changing the setting for any parameter, be sure to restart the MID Server service.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mid.powershell_api.session_pool.max_size</code></td>
+<td>Specifies the maximum number of sessions allowed in the session pool.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 25</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.session_pool.target.max_size</code></td>
+<td>Specifies the maximum number of sessions allowed in the pool per target host.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 3</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.use_ssl</code></td>
+<td>Requires the use of SSL certificates for HTTPS connections using WinRM.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.additional_pssesion_options</code></td>
+<td>Controls advanced options for a PSSession. For more information about advanced PSSession options, see <a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/new-pssessionoption?view=powershell-6">Microsoft documentation</a>.</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.remote_https_port</code></td>
+<td>Configures the port for connecting to Windows servers using PowerShell over HTTPS.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 5986</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.remote_port</code></td>
+<td>Configures the port for connecting to Windows servers using PowerShell over HTTP.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 5985</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.skip_ssl_cert_check</code></td>
+<td>Skips the SSL certificate check when using WinRM for HTTPS connections.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.winrm.skip_ssl_cert_check_options</code></td>
+<td>Skips specific SSL certificate checks when using WinRM for HTTPS connections.<br><strong>Type:</strong> String<br><strong>Default value:</strong> -SkipCACheck -SkipCNCheck -SkipRevocationCheck</td>
+</tr>
+<tr>
+<td><code>mid.powershell.use_credentials</code></td>
+<td>Determines the credentials to use for Discovery with PowerShell.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
+</tr>
+<tr>
+<td><code>mid.use_powershell</code></td>
+<td>Enables or disables PowerShell for Discovery.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
+</tr>
+<tr>
+<td><code>mid.powershell.path</code></td>
+<td>Enables an administrator to point to a specific PowerShell on a MID Server.<br><strong>Type:</strong> string (path)<br><strong>Default value:</strong> none</td>
+</tr>
+<tr>
+<td><code>mid.powershell.enforce_utf8</code></td>
+<td>Force commands on a target Windows system to return UTF-8 encoded output.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
+</tr>
+<tr>
+<td><code>mid.powershell.local_mid_service_credential_fallback</code></td>
+<td>Specifies the login credentials the MID Server uses if all other credentials fail.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> true</td>
+</tr>
+<tr>
+<td><code>mid.powershell_api.idle_session_timeout</code></td>
+<td>Specifies the timeout value of idle PowerShell sessions in seconds.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 60</td>
+</tr>
+<tr>
+<td><code>mid.powershell.command.parameter_passing</code></td>
+<td>Allow passing PowerShell parameters from the command line.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
+</tr>
+<tr>
+<td><code>mid.powershell.command.script.parameter_passing</code></td>
+<td>Allow passing PowerShell scripts from the command line.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
+</tr>
+<tr>
+<td><code>mid.windows.management_protocol</code></td>
+<td>Select the Windows management protocol used for device and process classification.<br><strong>Type:</strong> String<br><strong>Default value:</strong> WMI</td>
+</tr>
+<tr>
+<td><code>mid.windows.probe_timeout</code></td>
+<td>Sets the timeout interval for all Windows probes on a specific MID Server.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 600</td>
+</tr>
+</tbody></table>
+
+    </main>
+</body>
+</html>
