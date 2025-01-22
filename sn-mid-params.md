@@ -1,5 +1,3 @@
-Here's the cleaned-up version in proper Markdown format:
-
 # MID Server Parameters for PowerShell
 
 ## Release version: Xanadu, Washington DC, Vancouver, Utah
