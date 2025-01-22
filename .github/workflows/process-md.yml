@@ -1,42 +1,110 @@
-name: Process Markdown Files
+const fs = require('fs').promises;
+const path = require('path');
+const marked = require('marked');
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - '**.md'
-      - '.github/workflows/**'
-      - 'template.html'
+async function processMarkdownFiles() {
+    // Create docs directory if it doesn't exist
+    await fs.mkdir('docs', { recursive: true });
+    
+    // Get all markdown files
+    const files = await fs.readdir('.');
+    const mdFiles = files.filter(file => file.endsWith('.md'));
+    
+    // Process each markdown file
+    const pages = [];
+    for (const file of mdFiles) {
+        const content = await fs.readFile(file, 'utf8');
+        const html = marked.parse(content);
+        
+        // Create HTML file name
+        const htmlFileName = path.basename(file, '.md') + '.html';
+        const htmlPath = path.join('docs', htmlFileName);
+        
+        // Add to pages array for index
+        pages.push({
+            title: path.basename(file, '.md').replace(/-/g, ' '),
+            path: 'docs/' + htmlFileName
+        });
+        
+        // Generate page HTML
+        const pageHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${pages[pages.length - 1].title} - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        nav {
+            margin-bottom: 30px;
+        }
+        nav a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="../index.html">← Back to Index</a>
+    </nav>
+    ${html}
+</body>
+</html>`;
+        
+        await fs.writeFile(htmlPath, pageHtml);
+    }
+    
+    // Generate index.html
+    const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .doc-list {
+            list-style: none;
+            padding: 0;
+        }
+        .doc-list li {
+            margin: 10px 0;
+        }
+        .doc-list a {
+            color: #0366d6;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .doc-list a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Documentation</h1>
+    <ul class="doc-list">
+        ${pages.map(page => `<li><a href="${page.path}">${page.title}</a></li>`).join('\n        ')}
+    </ul>
+</body>
+</html>`;
+    
+    await fs.writeFile('index.html', indexHtml);
+}
 
-jobs:
-  process-markdown:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: |
-          npm init -y
-          npm install marked
-
-      - name: Process markdown files
-        run: node process-md.js
-
-      - name: Commit and push if changed
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/
-          git add index.html
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update documentation pages" && git push)
+processMarkdownFiles().catch(console.error);
