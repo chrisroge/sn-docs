@@ -1,23 +1,62 @@
-# MID Server Parameters for PowerShell
-Parameters control the behavior of a particular MID Server and have lower precedence than MID Server properties. The following parameters are optional.
-**Note:** After changing the setting for any parameter, be sure to restart the MID Server service.
-| Name | Description |
-|------|-------------|
-| mid.powershell_api.session_pool.max_size | Specifies the maximum number of sessions allowed in the session pool.<br>**Type:** Integer<br>**Default value:** 25 |
-| mid.powershell_api.session_pool.target.max_size | Specifies the maximum number of sessions allowed in the pool per target host.<br>**Type:** Integer<br>**Default value:** 3 |
-| mid.powershell_api.winrm.use_ssl | Requires the use of SSL certificates for HTTPS connections using WinRM.<br>**Type:** True | False<br>**Default value:** false |
-| mid.powershell_api.winrm.additional_pssesion_options | Controls advanced options for a PSSession. For more information about advanced PSSession options |
-| mid.powershell_api.winrm.remote_https_port | Configures the port for connecting to Windows servers using PowerShell over HTTPS.<br>**Type:** Integer<br>**Default value:** 5986 |
-| mid.powershell_api.winrm.remote_port | Configures the port for connecting to Windows servers using PowerShell over HTTP.<br>**Type:** Integer<br>**Default value:** 5985 |
-| mid.powershell_api.winrm.skip_ssl_cert_check | Skips the SSL certificate check when using WinRM for HTTPS connections.<br>**Type:** True | False<br>**Default value:** false |
-| mid.powershell_api.winrm.skip_ssl_cert_check_options | Skips specific SSL certificate checks when using WinRM for HTTPS connections.<br>**Type:** String<br>**Default value:** -SkipCACheck -SkipCNCheck -SkipRevocationCheck |
-| mid.powershell.use_credentials | Determines the credentials to use for Discovery with PowerShell.<br>**Type:** true | false<br>**Default value:** true |
-| mid.use_powershell | Enables or disables PowerShell for Discovery.<br>**Type:** true | false<br>**Default value:** true |
-| mid.powershell.path | Enables an administrator to point to a specific PowerShell on a MID Server.<br>**Type:** string (path)<br>**Default value:** none |
-| mid.powershell.enforce_utf8 | Force commands on a target Windows system to return UTF-8 encoded output.<br>**Type:** true | false<br>**Default value:** true |
-| mid.powershell.local_mid_service_credential_fallback | Specifies the login credentials the MID Server uses if all other credentials fail.<br>**Type:** True | False<br>**Default value:** true |
-| mid.powershell_api.idle_session_timeout | Specifies the timeout value of idle PowerShell sessions in seconds.<br>**Type:** Integer<br>**Default value:** 60 |
-| mid.powershell.command.parameter_passing | Allow passing PowerShell parameters from the command line.<br>**Type:** True | False<br>**Default value:** false |
-| mid.powershell.command.script.parameter_passing | Allow passing PowerShell scripts from the command line.<br>**Type:** True | False<br>**Default value:** false |
-| mid.windows.management_protocol | Select the Windows management protocol used for device and process classification.<br>**Type:** String<br>**Default value:** WMI |
-| mid.windows.probe_timeout | Sets the timeout interval for all Windows probes on a specific MID Server.<br>**Type:** Integer<br>**Default value:** 600 |
+You will rejoice to hear that no disaster has accompanied the
+commencement of an enterprise which you have regarded with such evil
+forebodings. I arrived here yesterday, and my first task is to assure
+my dear sister of my welfare and increasing confidence in the success
+of my undertaking.
+
+I am already far north of London, and as I walk in the streets of
+Petersburgh, I feel a cold northern breeze play upon my cheeks, which
+braces my nerves and fills me with delight. Do you understand this
+feeling? This breeze, which has travelled from the regions towards
+which I am advancing, gives me a foretaste of those icy climes.
+Inspirited by this wind of promise, my daydreams become more fervent
+and vivid. I try in vain to be persuaded that the pole is the seat of
+frost and desolation; it ever presents itself to my imagination as the
+region of beauty and delight. There, Margaret, the sun is for ever
+visible, its broad disk just skirting the horizon and diffusing a
+perpetual splendour. There—for with your leave, my sister, I will put
+some trust in preceding navigators—there snow and frost are banished;
+and, sailing over a calm sea, we may be wafted to a land surpassing in
+wonders and in beauty every region hitherto discovered on the habitable
+globe. Its productions and features may be without example, as the
+phenomena of the heavenly bodies undoubtedly are in those undiscovered
+solitudes. What may not be expected in a country of eternal light? I
+may there discover the wondrous power which attracts the needle and may
+regulate a thousand celestial observations that require only this
+voyage to render their seeming eccentricities consistent for ever. I
+shall satiate my ardent curiosity with the sight of a part of the world
+never before visited, and may tread a land never before imprinted by
+the foot of man. These are my enticements, and they are sufficient to
+conquer all fear of danger or death and to induce me to commence this
+laborious voyage with the joy a child feels when he embarks in a little
+boat, with his holiday mates, on an expedition of discovery up his
+native river. But supposing all these conjectures to be false, you
+cannot contest the inestimable benefit which I shall confer on all
+mankind, to the last generation, by discovering a passage near the pole
+to those countries, to reach which at present so many months are
+requisite; or by ascertaining the secret of the magnet, which, if at
+all possible, can only be effected by an undertaking such as mine.
+
+These reflections have dispelled the agitation with which I began my
+letter, and I feel my heart glow with an enthusiasm which elevates me
+to heaven, for nothing contributes so much to tranquillise the mind as
+a steady purpose—a point on which the soul may fix its intellectual
+eye. This expedition has been the favourite dream of my early years. I
+have read with ardour the accounts of the various voyages which have
+been made in the prospect of arriving at the North Pacific Ocean
+through the seas which surround the pole. You may remember that a
+history of all the voyages made for purposes of discovery composed the
+whole of our good Uncle Thomas’ library. My education was neglected,
+yet I was passionately fond of reading. These volumes were my study
+day and night, and my familiarity with them increased that regret which
+I had felt, as a child, on learning that my father’s dying injunction
+had forbidden my uncle to allow me to embark in a seafaring life.
+
+These visions faded when I perused, for the first time, those poets
+whose effusions entranced my soul and lifted it to heaven. I also
+became a poet and for one year lived in a paradise of my own creation;
+I imagined that I also might obtain a niche in the temple where the
+names of Homer and Shakespeare are consecrated. You are well
+acquainted with my failure and how heavily I bore the disappointment.
+But just at that time I inherited the fortune of my cousin, and my
+thoughts were turned into the channel of their earlier bent.
