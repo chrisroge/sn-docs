@@ -52,9 +52,6 @@
     </nav>
     <main>
         <h1>MID Server Parameters for PowerShell</h1>
-<h2>Release version: Xanadu, Washington DC, Vancouver, Utah</h2>
-<p><em>Updated: Jul 31, 2024</em></p>
-<p><em>3 minutes to read</em></p>
 <p>Parameters control the behavior of a particular MID Server and have lower precedence than MID Server properties. The following parameters are optional.</p>
 <p><strong>Note:</strong> After changing the setting for any parameter, be sure to restart the MID Server service.</p>
 <table>
@@ -65,75 +62,75 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><code>mid.powershell_api.session_pool.max_size</code></td>
+<td>mid.powershell_api.session_pool.max_size</td>
 <td>Specifies the maximum number of sessions allowed in the session pool.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 25</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.session_pool.target.max_size</code></td>
+<td>mid.powershell_api.session_pool.target.max_size</td>
 <td>Specifies the maximum number of sessions allowed in the pool per target host.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 3</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.use_ssl</code></td>
+<td>mid.powershell_api.winrm.use_ssl</td>
 <td>Requires the use of SSL certificates for HTTPS connections using WinRM.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.additional_pssesion_options</code></td>
+<td>mid.powershell_api.winrm.additional_pssesion_options</td>
 <td>Controls advanced options for a PSSession. For more information about advanced PSSession options</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.remote_https_port</code></td>
+<td>mid.powershell_api.winrm.remote_https_port</td>
 <td>Configures the port for connecting to Windows servers using PowerShell over HTTPS.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 5986</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.remote_port</code></td>
+<td>mid.powershell_api.winrm.remote_port</td>
 <td>Configures the port for connecting to Windows servers using PowerShell over HTTP.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 5985</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.skip_ssl_cert_check</code></td>
+<td>mid.powershell_api.winrm.skip_ssl_cert_check</td>
 <td>Skips the SSL certificate check when using WinRM for HTTPS connections.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.winrm.skip_ssl_cert_check_options</code></td>
+<td>mid.powershell_api.winrm.skip_ssl_cert_check_options</td>
 <td>Skips specific SSL certificate checks when using WinRM for HTTPS connections.<br><strong>Type:</strong> String<br><strong>Default value:</strong> -SkipCACheck -SkipCNCheck -SkipRevocationCheck</td>
 </tr>
 <tr>
-<td><code>mid.powershell.use_credentials</code></td>
+<td>mid.powershell.use_credentials</td>
 <td>Determines the credentials to use for Discovery with PowerShell.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
 </tr>
 <tr>
-<td><code>mid.use_powershell</code></td>
+<td>mid.use_powershell</td>
 <td>Enables or disables PowerShell for Discovery.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
 </tr>
 <tr>
-<td><code>mid.powershell.path</code></td>
+<td>mid.powershell.path</td>
 <td>Enables an administrator to point to a specific PowerShell on a MID Server.<br><strong>Type:</strong> string (path)<br><strong>Default value:</strong> none</td>
 </tr>
 <tr>
-<td><code>mid.powershell.enforce_utf8</code></td>
+<td>mid.powershell.enforce_utf8</td>
 <td>Force commands on a target Windows system to return UTF-8 encoded output.<br><strong>Type:</strong> true | false<br><strong>Default value:</strong> true</td>
 </tr>
 <tr>
-<td><code>mid.powershell.local_mid_service_credential_fallback</code></td>
+<td>mid.powershell.local_mid_service_credential_fallback</td>
 <td>Specifies the login credentials the MID Server uses if all other credentials fail.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> true</td>
 </tr>
 <tr>
-<td><code>mid.powershell_api.idle_session_timeout</code></td>
+<td>mid.powershell_api.idle_session_timeout</td>
 <td>Specifies the timeout value of idle PowerShell sessions in seconds.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 60</td>
 </tr>
 <tr>
-<td><code>mid.powershell.command.parameter_passing</code></td>
+<td>mid.powershell.command.parameter_passing</td>
 <td>Allow passing PowerShell parameters from the command line.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
 </tr>
 <tr>
-<td><code>mid.powershell.command.script.parameter_passing</code></td>
+<td>mid.powershell.command.script.parameter_passing</td>
 <td>Allow passing PowerShell scripts from the command line.<br><strong>Type:</strong> True | False<br><strong>Default value:</strong> false</td>
 </tr>
 <tr>
-<td><code>mid.windows.management_protocol</code></td>
+<td>mid.windows.management_protocol</td>
 <td>Select the Windows management protocol used for device and process classification.<br><strong>Type:</strong> String<br><strong>Default value:</strong> WMI</td>
 </tr>
 <tr>
-<td><code>mid.windows.probe_timeout</code></td>
+<td>mid.windows.probe_timeout</td>
 <td>Sets the timeout interval for all Windows probes on a specific MID Server.<br><strong>Type:</strong> Integer<br><strong>Default value:</strong> 600</td>
 </tr>
 </tbody></table>
