@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Multiple in ServiceNow - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+        }
+        nav {
+            width: 250px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-right: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        nav li {
+            margin: 8px 0;
+        }
+        nav a {
+            color: #333;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+        .current-page {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Documentation</h2>
+        <ul><li><a href="Create or Update Records in ServiceNow.html" >Create or Update Records in ServiceNow</a></li>
+<li><a href="Delete Multiple in ServiceNow.html" class="current-page">Delete Multiple in ServiceNow</a></li>
+<li><a href="README.html" >README</a></li>
+<li><a href="gliderecord-query.html" >gliderecord-query</a></li>
+<li><a href="shelly.html" >shelly</a></li>
+<li><a href="sn-user-object.html" >sn-user-object</a></li></ul>
+    </nav>
+    <main>
+        <h1>Delete Multiple Records in ServiceNow</h1>
+<h2>Overview</h2>
+<p>The <code>deleteMultiple()</code> operation provides an efficient way to delete multiple records that match specific criteria in ServiceNow. This method is more performant than deleting records individually in a loop.</p>
+<h2>Basic Usage</h2>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;u_exceptions&#39;);
+gr.addEncodedQuery(&#39;active=false&#39;);
+gr.deleteMultiple();
+</code></pre>
+<h2>Practical Examples</h2>
+<h3>Example 1: Delete Old Records with Age Check</h3>
+<pre><code class="language-javascript">var grIncident = new GlideRecord(&#39;incident&#39;);
+// Delete resolved incidents older than 90 days
+grIncident.addEncodedQuery(&#39;state=6^resolved_atRELATIVELE@dayofweek@ago@90&#39;);
+grIncident.query();
+var count = grIncident.getRowCount();
+gs.info(&#39;Deleting &#39; + count + &#39; old incidents&#39;);
+grIncident.deleteMultiple();
+</code></pre>
+<h3>Example 2: Batch Delete with Progress Tracking</h3>
+<pre><code class="language-javascript">function batchDelete(tableName, query, batchSize) {
+    var totalDeleted = 0;
+    var gr = new GlideRecord(tableName);
+    gr.addEncodedQuery(query);
+    gr.setLimit(batchSize);
+    
+    while (true) {
+        gr.query();
+        if (!gr.hasNext()) {
+            break;
+        }
+        
+        var count = gr.getRowCount();
+        gr.deleteMultiple();
+        totalDeleted += count;
+        
+        gs.info(&#39;Deleted batch of &#39; + count + &#39; records. Total deleted: &#39; + totalDeleted);
+    }
+    
+    return totalDeleted;
+}
+
+// Usage
+var deleted = batchDelete(&#39;incident&#39;, &#39;state=7^sys_created_onRELATIVELE@dayofweek@ago@365&#39;, 1000);
+gs.info(&#39;Total records deleted: &#39; + deleted);
+</code></pre>
+<h2>Advanced Features</h2>
+<h3>Pre-delete Validation</h3>
+<pre><code class="language-javascript">var gr = new GlideRecord(&#39;incident&#39;);
+gr.addEncodedQuery(&#39;state=7^closed_atRELATIVELE@dayofweek@ago@90&#39;);
+gr.query();
+
+while (gr.next()) {
+    // Check for related records before deletion
+    var relatedCount = new GlideAggregate(&#39;task&#39;);
+    relatedCount.addQuery(&#39;parent&#39;, gr.sys_id);
+    relatedCount.addActiveQuery();
+    relatedCount.query();
+    
+    if (relatedCount.getCount() &gt; 0) {
+        gs.warn(&#39;Skipping deletion of incident &#39; + gr.number + &#39; due to active child tasks&#39;);
+        continue;
+    }
+    
+    gr.deleteRecord();
+}
+</code></pre>
+<h3>Error Handling and Logging</h3>
+<pre><code class="language-javascript">function safeDeleteMultiple(table, query) {
+    try {
+        var gr = new GlideRecord(table);
+        gr.addEncodedQuery(query);
+        gr.query();
+        var count = gr.getRowCount();
+        
+        if (count &gt; 1000) {
+            gs.warn(&#39;Attempting to delete &#39; + count + &#39; records. Consider batch processing.&#39;);
+        }
+        
+        var success = gr.deleteMultiple();
+        if (!success) {
+            gs.error(&#39;Failed to delete records from &#39; + table);
+            return false;
+        }
+        
+        gs.info(&#39;Successfully deleted &#39; + count + &#39; records from &#39; + table);
+        return true;
+    } catch (ex) {
+        gs.error(&#39;Error deleting records: &#39; + ex.message);
+        return false;
+    }
+}
+</code></pre>
+<h2>Best Practices</h2>
+<ol>
+<li><p><strong>Pre-deletion Checks</strong></p>
+<ul>
+<li>Always verify the query returns expected records</li>
+<li>Consider archiving data before deletion</li>
+<li>Check for dependent records</li>
+</ul>
+</li>
+<li><p><strong>Performance Considerations</strong></p>
+<ul>
+<li>Use batch processing for large deletions</li>
+<li>Consider database load during peak hours</li>
+<li>Monitor system resources</li>
+</ul>
+</li>
+<li><p><strong>Security</strong></p>
+<ul>
+<li>Verify user permissions</li>
+<li>Log deletion operations</li>
+<li>Consider audit requirements</li>
+</ul>
+</li>
+<li><p><strong>Data Integrity</strong></p>
+<ul>
+<li>Check for referential integrity</li>
+<li>Consider soft deletes where appropriate</li>
+<li>Maintain audit trails</li>
+</ul>
+</li>
+</ol>
+<h2>Common Issues and Solutions</h2>
+<h3>Issue: Timeout with Large Deletions</h3>
+<pre><code class="language-javascript">// Solution: Use batch processing
+function batchDeleteWithTimeout(table, query, batchSize) {
+    var gr = new GlideRecord(table);
+    gr.addEncodedQuery(query);
+    gr.setLimit(batchSize);
+    gr.query();
+    
+    if (gr.hasNext()) {
+        gr.deleteMultiple();
+        // Schedule next batch
+        gs.schedule(&#39;Delete Next Batch&#39;, &#39;batchDeleteWithTimeout&#39;, table, query, batchSize);
+    }
+}
+</code></pre>
+<h3>Issue: Locked Records</h3>
+<pre><code class="language-javascript">// Solution: Skip locked records and retry
+function deleteWithLockCheck(table, query) {
+    var gr = new GlideRecord(table);
+    gr.addEncodedQuery(query);
+    gr.query();
+    
+    var skipped = [];
+    while (gr.next()) {
+        if (gr.isLocked()) {
+            skipped.push(gr.sys_id.toString());
+            continue;
+        }
+        gr.deleteRecord();
+    }
+    
+    return skipped; // Return skipped records for retry
+}
+</code></pre>
+<h2>Related Resources</h2>
+<ul>
+<li><a href="https://developer.servicenow.com/dev.do#!/reference/api/tokyo/server/no-namespace/c_GlideRecordAPI#r_GlideRecord-deleteMultiple">ServiceNow DeleteMultiple API Documentation</a></li>
+<li><a href="https://developer.servicenow.com/dev.do#!/guides/tokyo/now-platform/tpb-guide/data-cleanup">Best Practices for Data Cleanup</a></li>
+<li><a href="https://developer.servicenow.com/dev.do#!/guides/tokyo/now-platform/tpb-guide/performance_best_practices">ServiceNow Performance Best Practices</a></li>
+</ul>
+
+    </main>
+</body>
+</html>
