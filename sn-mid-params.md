@@ -17,7 +17,7 @@ Parameters control the behavior of a particular MID Server and have lower preced
 | `mid.powershell_api.session_pool.max_size` | Specifies the maximum number of sessions allowed in the session pool.<br>**Type:** Integer<br>**Default value:** 25 |
 | `mid.powershell_api.session_pool.target.max_size` | Specifies the maximum number of sessions allowed in the pool per target host.<br>**Type:** Integer<br>**Default value:** 3 |
 | `mid.powershell_api.winrm.use_ssl` | Requires the use of SSL certificates for HTTPS connections using WinRM.<br>**Type:** True \| False<br>**Default value:** false |
-| `mid.powershell_api.winrm.additional_pssesion_options` | Controls advanced options for a PSSession. For more information about advanced PSSession options, see [Microsoft documentation](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/new-pssessionoption?view=powershell-6). |
+| `mid.powershell_api.winrm.additional_pssesion_options` | Controls advanced options for a PSSession. For more information about advanced PSSession options |
 | `mid.powershell_api.winrm.remote_https_port` | Configures the port for connecting to Windows servers using PowerShell over HTTPS.<br>**Type:** Integer<br>**Default value:** 5986 |
 | `mid.powershell_api.winrm.remote_port` | Configures the port for connecting to Windows servers using PowerShell over HTTP.<br>**Type:** Integer<br>**Default value:** 5985 |
 | `mid.powershell_api.winrm.skip_ssl_cert_check` | Skips the SSL certificate check when using WinRM for HTTPS connections.<br>**Type:** True \| False<br>**Default value:** false |
